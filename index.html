@@ -1,79 +1,89 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fundamentos de Programação Python e Jogos de Lógica</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f9;
-            color: #333;
-            line-height: 1.6;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
-        pre {
-            background-color: #282c34;
-            color: #abb2bf;
-            padding: 15px;
-            border-radius: 6px;
-            overflow-x: auto;
-        }
-        code {
-            font-family: "Fira Code", Consolas, Monaco, monospace;
-        }
-        button.load {
-            background-color: #4b5263;
-            color: #ffffff;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-bottom: 20px;
-            font-size: 14px;
-            transition: background-color 0.2s;
-        }
-        button.load:hover {
-            background-color: #61afef;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python na Prática — Prof. Fabrício Trancoso</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#f4f6f8;color:#202124}
+header{background:#20232a;color:#fff;padding:24px 5%;text-align:center}
+header h1{margin:0 0 8px;font-size:28px}
+main{max-width:1050px;margin:25px auto;padding:0 18px}
+.card{background:#fff;border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0001}
+.step{border-left:5px solid #444;padding-left:15px}
+textarea{width:100%;height:280px;box-sizing:border-box;background:#111827;color:#f8fafc;border:0;border-radius:10px;padding:16px;font:15px Consolas,monospace;resize:vertical}
+button{border:0;border-radius:8px;padding:10px 15px;margin:6px 5px 0 0;cursor:pointer;font-weight:bold}
+.run{background:#16a34a;color:#fff}.load{background:#2563eb;color:#fff}.clear{background:#e5e7eb}
+#output{background:#0b1220;color:#d1fae5;min-height:130px;white-space:pre-wrap;border-radius:10px;padding:16px;font:15px Consolas,monospace;margin-top:12px}
+.status{font-size:14px;margin:10px 0}
+code{background:#eef2f7;padding:2px 5px;border-radius:4px}
+pre code{display:block;background:#f1f5f9;padding:14px;border-radius:8px;white-space:pre-wrap}
+.tip{background:#fff7ed;border-radius:10px;padding:12px}
+footer{text-align:center;padding:25px;color:#666;font-size:13px}
+</style>
 </head>
 <body>
+<header>
+<h1>🐍 Python na Prática</h1>
+<div>Laboratório de programação — Prof. Fabrício Trancoso</div>
+</header>
 
-    <h1>Exercícios de Lógica de Programação em Python</h1>
+<main>
+<div class="card">
+<h2>🚀 Como usar</h2>
+<ol>
+<li>Escolha uma etapa.</li>
+<li>Clique em <b>Carregar no editor</b>.</li>
+<li>Clique em <b>▶ Executar Python</b>.</li>
+<li>Veja o resultado abaixo.</li>
+</ol>
+<div id="status" class="status">⏳ Carregando o interpretador Python...</div>
+<div class="tip"><b>Dica:</b> mantenha as quebras de linha do código. No Python, a organização do código é importante.</div>
+</div>
 
-    <section>
-        <h2>1. Avaliação Condicional Simples</h2>
-        <pre><code>if numero > 10:
+<div class="card step">
+<h2>1️⃣ Primeiro programa</h2>
+<pre><code>print("Olá, mundo!")</code></pre>
+<button class="load" onclick="carregar(0)">Carregar no editor</button>
+</div>
+
+<div class="card step">
+<h2>2️⃣ Entrada de dados</h2>
+<pre><code>nome = input("Qual é o seu nome? ")
+print("Olá,", nome)</code></pre>
+<button class="load" onclick="carregar(1)">Carregar no editor</button>
+</div>
+
+<div class="card step">
+<h2>3️⃣ Variáveis e números</h2>
+<pre><code>idade = int(input("Qual é sua idade? "))
+print("Daqui a 5 anos você terá", idade + 5)</code></pre>
+<button class="load" onclick="carregar(2)">Carregar no editor</button>
+</div>
+
+<div class="card step">
+<h2>4️⃣ Tomando decisões</h2>
+<pre><code>numero = int(input("Digite um número: "))
+
+if numero > 10:
     print("Maior que 10")
 elif numero < 10:
     print("Menor que 10")
 else:
     print("É igual a 10")</code></pre>
-        <button class="load" onclick="carregar(3)">Carregar no editor</button>
-    </section>
+<button class="load" onclick="carregar(3)">Carregar no editor</button>
+</div>
 
-    <section>
-        <h2>2. Jogo do Número Secreto</h2>
-        <pre><code>import random
+<div class="card step">
+<h2>5️⃣ Número secreto</h2>
+<pre><code>import random
 
 numero_secreto = random.randint(1, 100)
+
 print("Estou pensando em um número de 1 a 100.")
 
 while True:
-    entrada = input("Digite seu palpite: ")
-    
-    # Tratamento para evitar que entradas vazias ou textos travem o programa
-    try:
-        tentativa = int(entrada)
-    except ValueError:
-        print("⚠️ Por favor, digite um número inteiro válido!")
-        continue
+    tentativa = int(input("Digite seu palpite: "))
 
     if tentativa == numero_secreto:
         print("🎉 VOCÊ ACERTOU!")
@@ -82,14 +92,126 @@ while True:
         print("⬆️ O número é MAIOR!")
     else:
         print("⬇️ O número é MENOR!")</code></pre>
-        <button class="load" onclick="carregar(4)">Carregar no editor</button>
-    </section>
+<button class="load" onclick="carregar(4)">Carregar no editor</button>
+</div>
 
-    <script>
-        function carregar(id) {
-            console.log("Carregando exemplo " + id + " no editor...");
-            // Adicione aqui a lógica de integração com o editor de código da sua página
-        }
-    </script>
+<div class="card">
+<h2>💻 Seu editor Python</h2>
+<textarea id="editor">print("Olá, programador!")</textarea><br>
+<button class="run" onclick="executar()">▶ Executar Python</button>
+<button class="clear" onclick="limpar()">🧹 Limpar</button>
+<button onclick="copiar()">📋 Copiar</button>
+<div id="output">A saída do seu programa aparecerá aqui.</div>
+</div>
+
+<div class="card">
+<h2>🏆 Desafios</h2>
+<ul>
+<li>Conte quantas tentativas o jogador fez.</li>
+<li>Faça o jogador ter no máximo 10 tentativas.</li>
+<li>Mostre uma mensagem especial se acertar em até 5 tentativas.</li>
+<li>Troque o intervalo de 1–100 para 1–50.</li>
+</ul>
+</div>
+</main>
+
+<footer>Material didático — Prof. Fabrício Trancoso</footer>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+<script>
+let pyodide = null;
+
+const exemplos = [
+`print("Olá, mundo!")`,
+`nome = input("Qual é o seu nome? ")
+print("Olá,", nome)`,
+`idade = int(input("Qual é sua idade? "))
+print("Daqui a 5 anos você terá", idade + 5)`,
+`numero = int(input("Digite um número: "))
+
+if numero > 10:
+    print("Maior que 10")
+elif numero < 10:
+    print("Menor que 10")
+else:
+    print("É igual a 10")`,
+`import random
+
+numero_secreto = random.randint(1, 100)
+
+print("Estou pensando em um número de 1 a 100.")
+
+while True:
+    tentativa = int(input("Digite seu palpite: "))
+
+    if tentativa == numero_secreto:
+        print("VOCÊ ACERTOU!")
+        break
+    elif tentativa < numero_secreto:
+        print("O número é MAIOR!")
+    else:
+        print("O número é MENOR!")`
+];
+
+async function iniciarPython(){
+  try{
+    pyodide = await loadPyodide();
+    document.getElementById("status").textContent =
+      "✅ Python pronto! Escolha uma etapa e execute.";
+  }catch(e){
+    document.getElementById("status").textContent =
+      "❌ Erro ao carregar Python. Verifique sua conexão com a internet.";
+  }
+}
+
+function carregar(i){
+  document.getElementById("editor").value = exemplos[i];
+  document.getElementById("output").textContent = "Código carregado. Clique em ▶ Executar Python.";
+  document.getElementById("editor").focus();
+}
+
+async function executar(){
+  if(!pyodide){
+    document.getElementById("output").textContent = "Aguarde o Python carregar.";
+    return;
+  }
+
+  const code = document.getElementById("editor").value;
+  const output = document.getElementById("output");
+  output.textContent = "";
+
+  pyodide.setStdout({batched: msg => {
+    output.textContent += msg + "\n";
+  }});
+
+  pyodide.setStderr({batched: msg => {
+    output.textContent += "ERRO: " + msg + "\n";
+  }});
+
+  pyodide.setStdin({
+    stdin: function() {
+      const resposta = window.prompt("Digite sua resposta:");
+      return resposta === null ? "" : resposta;
+    }
+  });
+
+  try{
+    await pyodide.runPythonAsync(code);
+  }catch(e){
+    output.textContent = String(e);
+  }
+}
+
+function limpar(){
+  document.getElementById("editor").value = "";
+  document.getElementById("output").textContent = "";
+}
+
+async function copiar(){
+  await navigator.clipboard.writeText(document.getElementById("editor").value);
+}
+
+iniciarPython();
+</script>
 </body>
 </html>
