@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentos de Programação Python e Jogos de Lógica</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        code {
+            font-family: "Fira Code", Consolas, Monaco, monospace;
+        }
+        button.load {
+            background-color: #4b5263;
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        button.load:hover {
+            background-color: #61afef;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Exercícios de Lógica de Programação em Python</h1>
+
+    <section>
+        <h2>1. Avaliação Condicional Simples</h2>
+        <pre><code>if numero > 10:
+    print("Maior que 10")
+elif numero < 10:
+    print("Menor que 10")
+else:
+    print("É igual a 10")</code></pre>
+        <button class="load" onclick="carregar(3)">Carregar no editor</button>
+    </section>
+
+    <section>
+        <h2>2. Jogo do Número Secreto</h2>
+        <pre><code>import random
+
+numero_secreto = random.randint(1, 100)
+print("Estou pensando em um número de 1 a 100.")
+
+while True:
+    entrada = input("Digite seu palpite: ")
+    
+    # Tratamento para evitar que entradas vazias ou textos travem o programa
+    try:
+        tentativa = int(entrada)
+    except ValueError:
+        print("⚠️ Por favor, digite um número inteiro válido!")
+        continue
+
+    if tentativa == numero_secreto:
+        print("🎉 VOCÊ ACERTOU!")
+        break
+    elif tentativa < numero_secreto:
+        print("⬆️ O número é MAIOR!")
+    else:
+        print("⬇️ O número é MENOR!")</code></pre>
+        <button class="load" onclick="carregar(4)">Carregar no editor</button>
+    </section>
+
+    <script>
+        function carregar(id) {
+            console.log("Carregando exemplo " + id + " no editor...");
+            // Adicione aqui a lógica de integração com o editor de código da sua página
+        }
+    </script>
+</body>
+</html>
