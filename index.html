@@ -1,123 +1,357 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/6.65.7/mode/python/python.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compilador Online Python & Robótica</title>
+  <!-- Motores de Execução Python em Navegador (Skulpt) -->
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js" type="text/javascript"></script>
 
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
-
-        .editor-container {
-            margin-bottom: 20px;
-        }
-
-        #run-button,#clear-button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #output-box-container {
-            height: 100px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: rgb(245, 245, 245);
-        }
-
-        .console-output {
-            overflow-y: scroll;
-            height: 200px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            background-color: #222;
-            color: #00FF00;
-            white-space: pre-wrap;
-            font-family: 'Lucida Console', 'Courier New', monospace;
-        }
-    </style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: #f8fafc;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #1e293b;
+      padding: 15px 25px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 1.5em;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .controls-header {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    select {
+      background-color: #090d16;
+      color: #f8fafc;
+      border: 1px solid #38bdf8;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.95em;
+      cursor: pointer;
+    }
+    .ide-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+    @media (max-width: 850px) {
+      .ide-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    .panel {
+      background-color: #1e293b;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: #94a3b8;
+      font-size: 0.95em;
+    }
+    textarea {
+      width: 100%;
+      flex: 1;
+      min-height: 380px;
+      background-color: #090d16;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 15px;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 1.05em;
+      line-height: 1.5;
+      resize: vertical;
+      outline: none;
+    }
+    textarea:focus {
+      border-color: #38bdf8;
+    }
+    .terminal {
+      width: 100%;
+      flex: 1;
+      min-height: 380px;
+      background-color: #090d16;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      padding: 15px;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 1.05em;
+      line-height: 1.5;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .btn-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn {
+      background-color: #0284c7;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      font-size: 1em;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover {
+      background-color: #0369a1;
+    }
+    .btn-green {
+      background-color: #16a34a;
+    }
+    .btn-green:hover {
+      background-color: #15803d;
+    }
+    .btn-clear {
+      background-color: #475569;
+    }
+    .btn-clear:hover {
+      background-color: #334155;
+    }
+    .helper-bar {
+      margin-top: 15px;
+      background-color: #0f172a;
+      border: 1px dashed #334155;
+      padding: 10px 15px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      color: #94a3b8;
+    }
+    .helper-bar code {
+      color: #38bdf8;
+      background-color: #1e293b;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
-
 <body>
-    <h1>Python Online Interpreter</h1>
-    <div class="editor-container">
-        <textarea id="code-editor">print("Hello from Python!")</textarea>
+
+  <div class="header">
+    <h1>🐍 Compilador Python & Robótica</h1>
+    <div class="controls-header">
+      <label for="example-select" style="font-weight: bold;">📚 Exemplos:</label>
+      <select id="example-select" onchange="loadExample()">
+        <option value="">-- Carregar Exemplo de Aula --</option>
+        <option value="ex1">1. Entrada e Saída (input / print)</option>
+        <option value="ex2">2. Tomada de Decisão (if / elif / else)</option>
+        <option value="ex3">3. Loop Contínuo (while True / break)</option>
+        <option value="ex4">4. Tratamento de Erros (try / except)</option>
+        <option value="ex5">5. Sorteio de Rotas (random)</option>
+        <option value="ex6">6. Campainha para Surdos (Fibonacci)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="ide-container">
+    <!-- PAINEL DO EDITOR DE CÓDIGO -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>📝 EDITOR DE CÓDIGO PYTHON</span>
+        <span style="font-size: 0.85em;">Dica: Use a tecla [TAB] para recuar</span>
+      </div>
+      <textarea id="code-editor" placeholder="# Digite seu código Python aqui ou escolha um exemplo acima..."></textarea>
+      <div class="btn-bar">
+        <button class="btn btn-green" onclick="runPython()">▶️ Executar Código</button>
+        <button class="btn btn-clear" onclick="downloadCode()">💾 Salvar .py</button>
+      </div>
     </div>
 
-    <button id="run-button">Run</button>
-    <button id="clear-button">Clear Console</button>
-    <div class="console-output" id="consoleOutput"></div>
-    <div id="output-box-container"></div>
-        <script>
-            (function() {
-                var oldConsoleLog = console.log;
-                console.log = function(message) {
-                    var consoleOutput = document.getElementById('consoleOutput');
-                    if (consoleOutput) {
-                        consoleOutput.textContent += message + '\n';
-                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                    }
-                    oldConsoleLog.apply(console, arguments);
-                };
-            })();
-            </script>
+    <!-- PAINEL DO TERMINAL DE SAÍDA -->
+    <div class="panel">
+      <div class="panel-header">
+        <span>💻 TERMINAL / SAÍDA DO ROBÔ</span>
+        <button class="btn btn-clear" style="padding: 4px 8px; font-size: 0.8em;" onclick="clearConsole()">🧹 Limpar</button>
+      </div>
+      <div id="console-output" class="terminal">Console pronto. Clique em "Executar Código" para rodar.</div>
+    </div>
+  </div>
 
-    <script type="text/javascript">
-        async function main() {
-           let pyodide = await loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/" });
-            console.log("Ready to run your program...");
-            // numpy and matplitlib package
-            await pyodide.loadPackage(['numpy', 'matplotlib']);
+  <div class="helper-bar">
+    <strong>💡 Comandos Rápidos:</strong> 
+    <code>print("texto")</code> | 
+    <code>input("pergunta")</code> | 
+    <code>int(input())</code> | 
+    <code>if / elif / else</code> | 
+    <code>while True: ... break</code> | 
+    <code>try: ... except ValueError:</code>
+  </div>
 
-            var editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
-                lineNumbers: true,
-                mode: "python"
-            });
+  <script>
+    // DICIONÁRIO DE EXEMPLOS DE AULA
+    const exemplos = {
+      ex1: `# Exemplo 1: Entrada e Saída de Dados
+nome = input("Digite o nome do operador do robô: ")
+print("Olá,", nome, "! O robô está pronto para rodar.")`,
 
-            let runningProcess = null;
+      ex2: `# Exemplo 2: Tomada de Decisão (if / elif / else)
+distancia = float(input("Digite a distância do sensor (cm): "))
 
-            document.getElementById('run-button').addEventListener('click', async () => {
-                const code = editor.getValue();
+if distancia <= 10.0:
+    print("🛑 PERIGO: Obstáculo muito próximo! Parar motores.")
+elif distancia <= 30.0:
+    print("🟡 ATENÇÃO: Reduzindo velocidade do carrinho.")
+else:
+    print("🟢 LIBERADO: Caminho livre, acelerando.")`,
 
-                document.getElementById('output-box-container').innerHTML = '';
+      ex3: `# Exemplo 3: Loop Contínuo e Emergência (while True e break)
+while True:
+    comando = input("Digite 'parar' para desligar o robô ou 'rodar' para continuar: ")
+    if comando == "parar":
+        print("🤖 Robô desligado com segurança!")
+        break
+    print("🚚 Robô em movimento executando tarefas...")`,
 
-                try {
-                   // let output = pyodide.runPython(document.getElementById(code));
-                   const output = await pyodide.runPythonAsync(code);
-                    //const output = await pyodide.runPythonAsync(code);
-                    displayOutput(output);
-                } catch (error) {
-                    displayOutput('Error: ' + error.toString());
-                }
-            });
+      ex4: `# Exemplo 4: Proteção contra Erros (try / except)
+entrada = input("Digite a leitura do sensor (número): ")
 
-            
-             document.getElementById('clear-button').addEventListener('click', () => {
-                document.getElementById('consoleOutput').innerHTML = '';
-            });
-            
-            function displayOutput(output) {
-                const outputBox = document.getElementById('output-box-container');
-                outputBox.textContent = output;
-            }
+try:
+    valor = int(entrada)
+    print("✅ Leitura numética válida recebida:", valor, "cm")
+except ValueError:
+    print("⚠️ ERRO DE SENSOR: Dado corrompido recebido! Mantendo o sistema seguro.")`,
+
+      ex5: `# Exemplo 5: Sorteio de Rotas (random)
+import random
+
+rotas = ["Laboratório 1", "Biblioteca", "Secretaria"]
+sorteada = random.randint(0, 2)
+
+print("🚚 Rota sorteada para a entrega:", rotas[sorteada])`,
+
+      ex6: `# Exemplo 6: Projeto Campainha Acessível para Surdos (Fibonacci)
+# Padrão rítmico visual: 1, 1, 2, 3, 5
+sequencia_fibonacci = [1, 1, 2, 3, 5]
+
+print("🔔 Simulador da Campainha Acessível para Surdos")
+
+for piscadas in sequencia_fibonacci:
+    print("⚡ LED piscando", piscadas, "vez(es) no padrão Fibonacci...")
+
+print("✅ Padrão de sinalização visual concluído com sucesso!")`
+    };
+
+    // SUPORTE À TECLA TAB NO TEXTAREA
+    document.getElementById('code-editor').addEventListener('keydown', function(e) {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        var start = this.selectionStart;
+        var end = this.selectionEnd;
+        this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+        this.selectionStart = this.selectionEnd = start + 4;
+      }
+    });
+
+    function loadExample() {
+      const select = document.getElementById("example-select");
+      const key = select.value;
+      if (key && exemplos[key]) {
+        document.getElementById("code-editor").value = exemplos[key];
+      }
+    }
+
+    function clearConsole() {
+      document.getElementById("console-output").innerHTML = "";
+    }
+
+    function builtinRead(x) {
+      if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) {
+        throw "Arquivo não encontrado: '" + x + "'";
+      }
+      return Sk.builtinFiles["files"][x];
+    }
+
+    function runPython() {
+      const code = document.getElementById("code-editor").value;
+      const consoleOutput = document.getElementById("console-output");
+      consoleOutput.innerHTML = ""; // Limpa console
+
+      Sk.pre = "console-output";
+      Sk.configure({
+        output: function(text) {
+          consoleOutput.innerHTML += text;
+          consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        },
+        read: builtinRead,
+        inputfun: function(promptText) {
+          return new Promise(function(resolve) {
+            let userInput = window.prompt(promptText || "Entrada do Usuário:");
+            if (userInput === null) userInput = "";
+            consoleOutput.innerHTML += (promptText || "") + " " + userInput + "\n";
+            resolve(userInput);
+          });
+        },
+        inputfunTakesPrompt: true
+      });
+
+      var myPromise = Sk.miscellaneous.pyCheckArgs ? Sk.importMainWithBody("<stdin>", false, code, true) : Sk.importMainWithBody("<stdin>", false, code);
+
+      myPromise.then(
+        function() {
+          consoleOutput.innerHTML += "\n\n[🟢 Execução Concluída]";
+        },
+        function(err) {
+          consoleOutput.innerHTML += "\n\n❌ ERRO NO CÓDIGO:\n" + err.toString();
         }
-        main();
-    </script>
-</body>
+      );
+    }
 
+    function downloadCode() {
+      const text = document.getElementById("code-editor").value;
+      const blob = new Blob([text], { type: "text/plain" });
+      const anchor = document.createElement("a");
+      anchor.download = "codigo_robotica.py";
+      anchor.href = window.URL.createObjectURL(blob);
+      anchor.target = "_blank";
+      anchor.style.display = "none";
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+    }
+  </script>
+
+</body>
 </html>
