@@ -4,14 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compilador Online Python & Robótica</title>
-  <!-- Motores de Execução Python em Navegador (Skulpt) -->
-  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js" type="text/javascript"></script>
-  <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js" type="text/javascript"></script>
+  
+  <!-- Motores do Python (Servidor Cloudflare - Alta compatibilidade escolar) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js" type="text/javascript"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js" type="text/javascript"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #0f172a;
@@ -63,9 +62,7 @@
       flex: 1;
     }
     @media (max-width: 850px) {
-      .ide-container {
-        grid-template-columns: 1fr;
-      }
+      .ide-container { grid-template-columns: 1fr; }
     }
     .panel {
       background-color: #1e293b;
@@ -99,9 +96,7 @@
       resize: vertical;
       outline: none;
     }
-    textarea:focus {
-      border-color: #38bdf8;
-    }
+    textarea:focus { border-color: #38bdf8; }
     .terminal {
       width: 100%;
       flex: 1;
@@ -136,21 +131,11 @@
       align-items: center;
       gap: 6px;
     }
-    .btn:hover {
-      background-color: #0369a1;
-    }
-    .btn-green {
-      background-color: #16a34a;
-    }
-    .btn-green:hover {
-      background-color: #15803d;
-    }
-    .btn-clear {
-      background-color: #475569;
-    }
-    .btn-clear:hover {
-      background-color: #334155;
-    }
+    .btn:hover { background-color: #0369a1; }
+    .btn-green { background-color: #16a34a; }
+    .btn-green:hover { background-color: #15803d; }
+    .btn-clear { background-color: #475569; }
+    .btn-clear:hover { background-color: #334155; }
     .helper-bar {
       margin-top: 15px;
       background-color: #0f172a;
@@ -206,7 +191,7 @@
         <span>💻 TERMINAL / SAÍDA DO ROBÔ</span>
         <button class="btn btn-clear" style="padding: 4px 8px; font-size: 0.8em;" onclick="clearConsole()">🧹 Limpar</button>
       </div>
-      <div id="console-output" class="terminal">Console pronto. Clique em "Executar Código" para rodar.</div>
+      <div id="console-output" class="terminal">Console pronto. Digite seu código e clique em "▶️ Executar Código".</div>
     </div>
   </div>
 
@@ -250,7 +235,7 @@ entrada = input("Digite a leitura do sensor (número): ")
 
 try:
     valor = int(entrada)
-    print("✅ Leitura numética válida recebida:", valor, "cm")
+    print("✅ Leitura numérica válida recebida:", valor, "cm")
 except ValueError:
     print("⚠️ ERRO DE SENSOR: Dado corrompido recebido! Mantendo o sistema seguro.")`,
 
@@ -274,7 +259,7 @@ for piscadas in sequencia_fibonacci:
 print("✅ Padrão de sinalização visual concluído com sucesso!")`
     };
 
-    // SUPORTE À TECLA TAB NO TEXTAREA
+    // SUPORTE À TECLA TAB NO EDITOR
     document.getElementById('code-editor').addEventListener('keydown', function(e) {
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -285,11 +270,14 @@ print("✅ Padrão de sinalização visual concluído com sucesso!")`
       }
     });
 
+    // CARREGA EXEMPLOS NO EDITOR
     function loadExample() {
       const select = document.getElementById("example-select");
       const key = select.value;
       if (key && exemplos[key]) {
         document.getElementById("code-editor").value = exemplos[key];
+        // Coloca um código simples inicial para testar
+        clearConsole();
       }
     }
 
@@ -304,10 +292,23 @@ print("✅ Padrão de sinalização visual concluído com sucesso!")`
       return Sk.builtinFiles["files"][x];
     }
 
+    // EXECUTA O CÓDIGO PYTHON
     function runPython() {
-      const code = document.getElementById("code-editor").value;
       const consoleOutput = document.getElementById("console-output");
-      consoleOutput.innerHTML = ""; // Limpa console
+      const code = document.getElementById("code-editor").value;
+
+      // 1. CHECAGEM DE SEGURANÇA: BIBLIOTECA FOI CARREGADA?
+      if (typeof Sk === 'undefined') {
+        consoleOutput.innerHTML = "❌ ERRO DE CARREGAMENTO:\n\nA biblioteca do Python (Skulpt) não foi encontrada.\n\nPossíveis motivos:\n1. O computador está sem acesso à internet.\n2. O firewall/filtro da escola bloqueou o servidor 'cdnjs.cloudflare.com'.\n\n💡 Solução: Solicite à TI da escola a liberação do domínio 'cdnjs.cloudflare.com'.";
+        return;
+      }
+
+      if (!code.trim()) {
+        consoleOutput.innerHTML = "⚠️ O editor está vazio! Digite um código ou selecione um exemplo acima.";
+        return;
+      }
+
+      consoleOutput.innerHTML = "[⏳ Processando código...]\n\n";
 
       Sk.pre = "console-output";
       Sk.configure({
@@ -331,10 +332,10 @@ print("✅ Padrão de sinalização visual concluído com sucesso!")`
 
       myPromise.then(
         function() {
-          consoleOutput.innerHTML += "\n\n[🟢 Execução Concluída]";
+          consoleOutput.innerHTML += "\n[🟢 Execução Concluída]";
         },
         function(err) {
-          consoleOutput.innerHTML += "\n\n❌ ERRO NO CÓDIGO:\n" + err.toString();
+          consoleOutput.innerHTML += "\n❌ ERRO NO CÓDIGO:\n" + err.toString();
         }
       );
     }
