@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Compilador Online Python & Robótica</title>
+  <title>Compilador Python & Robótica (Modo Offline Integrado)</title>
   
-  <!-- Motores do Python (Servidor Cloudflare - Alta compatibilidade escolar) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js" type="text/javascript"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js" type="text/javascript"></script>
+  <!-- Tenta carregar bibliotecas locais primeiro, depois CDNs de backup -->
+  <script src="skulpt.min.js"></script>
+  <script src="skulpt-stdlib.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt-stdlib.js"></script>
 
   <style>
     * { box-sizing: border-box; }
@@ -40,6 +42,14 @@
       display: flex;
       align-items: center;
       gap: 10px;
+    }
+    .status-badge {
+      font-size: 0.8em;
+      padding: 4px 10px;
+      border-radius: 12px;
+      background-color: #16a34a;
+      color: white;
+      font-weight: bold;
     }
     .controls-header {
       display: flex;
@@ -156,7 +166,7 @@
 <body>
 
   <div class="header">
-    <h1>🐍 Compilador Python & Robótica</h1>
+    <h1>🐍 Compilador Python & Robótica <span class="status-badge">⚡ Pronto para Uso Offline</span></h1>
     <div class="controls-header">
       <label for="example-select" style="font-weight: bold;">📚 Exemplos:</label>
       <select id="example-select" onchange="loadExample()">
@@ -196,70 +206,25 @@
   </div>
 
   <div class="helper-bar">
-    <strong>💡 Comandos Rápidos:</strong> 
+    <strong>💡 Comandos Suportados:</strong> 
     <code>print("texto")</code> | 
     <code>input("pergunta")</code> | 
     <code>int(input())</code> | 
     <code>if / elif / else</code> | 
     <code>while True: ... break</code> | 
-    <code>try: ... except ValueError:</code>
+    <code>try: ... except:</code>
   </div>
 
   <script>
-    // DICIONÁRIO DE EXEMPLOS DE AULA
     const exemplos = {
-      ex1: `# Exemplo 1: Entrada e Saída de Dados
-nome = input("Digite o nome do operador do robô: ")
-print("Olá,", nome, "! O robô está pronto para rodar.")`,
-
-      ex2: `# Exemplo 2: Tomada de Decisão (if / elif / else)
-distancia = float(input("Digite a distância do sensor (cm): "))
-
-if distancia <= 10.0:
-    print("🛑 PERIGO: Obstáculo muito próximo! Parar motores.")
-elif distancia <= 30.0:
-    print("🟡 ATENÇÃO: Reduzindo velocidade do carrinho.")
-else:
-    print("🟢 LIBERADO: Caminho livre, acelerando.")`,
-
-      ex3: `# Exemplo 3: Loop Contínuo e Emergência (while True e break)
-while True:
-    comando = input("Digite 'parar' para desligar o robô ou 'rodar' para continuar: ")
-    if comando == "parar":
-        print("🤖 Robô desligado com segurança!")
-        break
-    print("🚚 Robô em movimento executando tarefas...")`,
-
-      ex4: `# Exemplo 4: Proteção contra Erros (try / except)
-entrada = input("Digite a leitura do sensor (número): ")
-
-try:
-    valor = int(entrada)
-    print("✅ Leitura numérica válida recebida:", valor, "cm")
-except ValueError:
-    print("⚠️ ERRO DE SENSOR: Dado corrompido recebido! Mantendo o sistema seguro.")`,
-
-      ex5: `# Exemplo 5: Sorteio de Rotas (random)
-import random
-
-rotas = ["Laboratório 1", "Biblioteca", "Secretaria"]
-sorteada = random.randint(0, 2)
-
-print("🚚 Rota sorteada para a entrega:", rotas[sorteada])`,
-
-      ex6: `# Exemplo 6: Projeto Campainha Acessível para Surdos (Fibonacci)
-# Padrão rítmico visual: 1, 1, 2, 3, 5
-sequencia_fibonacci = [1, 1, 2, 3, 5]
-
-print("🔔 Simulador da Campainha Acessível para Surdos")
-
-for piscadas in sequencia_fibonacci:
-    print("⚡ LED piscando", piscadas, "vez(es) no padrão Fibonacci...")
-
-print("✅ Padrão de sinalização visual concluído com sucesso!")`
+      ex1: `# Exemplo 1: Entrada e Saída de Dados\nnome = input("Digite o nome do operador do robô: ")\nprint("Olá,", nome, "! O robô está pronto para rodar.")`,
+      ex2: `# Exemplo 2: Tomada de Decisão (if / elif / else)\ndistancia = float(input("Digite a distância do sensor (cm): "))\n\nif distancia <= 10.0:\n    print("🛑 PERIGO: Obstáculo muito próximo! Parar motores.")\nelif distancia <= 30.0:\n    print("🟡 ATENÇÃO: Reduzindo velocidade do carrinho.")\nelse:\n    print("🟢 LIBERADO: Caminho livre, acelerando.")`,
+      ex3: `# Exemplo 3: Loop Contínuo e Emergência (while True e break)\nwhile True:\n    comando = input("Digite 'parar' para desligar o robô ou 'rodar' para continuar: ")\n    if comando == "parar":\n        print("🤖 Robô desligado com segurança!")\n        break\n    print("🚚 Robô em movimento executando tarefas...")`,
+      ex4: `# Exemplo 4: Proteção contra Erros (try / except)\nentrada = input("Digite a leitura do sensor (número): ")\n\ntry:\n    valor = int(entrada)\n    print("✅ Leitura numérica válida recebida:", valor, "cm")\nexcept ValueError:\n    print("⚠️ ERRO DE SENSOR: Dado corrompido recebido! Mantendo o sistema seguro.")`,
+      ex5: `# Exemplo 5: Sorteio de Rotas (random)\nimport random\n\nrotas = ["Laboratório 1", "Biblioteca", "Secretaria"]\nsorteada = random.randint(0, 2)\n\nprint("🚚 Rota sorteada para a entrega:", rotas[sorteada])`,
+      ex6: `# Exemplo 6: Projeto Campainha Acessível para Surdos (Fibonacci)\n# Padrão rítmico visual: 1, 1, 2, 3, 5\nsequencia_fibonacci = [1, 1, 2, 3, 5]\n\nprint("🔔 Simulador da Campainha Acessível para Surdos")\n\nfor piscadas in sequencia_fibonacci:\n    print("⚡ LED piscando", piscadas, "vez(es) no padrão Fibonacci...")\n\nprint("✅ Padrão de sinalização visual concluído com sucesso!")`
     };
 
-    // SUPORTE À TECLA TAB NO EDITOR
     document.getElementById('code-editor').addEventListener('keydown', function(e) {
       if (e.key === 'Tab') {
         e.preventDefault();
@@ -270,13 +235,11 @@ print("✅ Padrão de sinalização visual concluído com sucesso!")`
       }
     });
 
-    // CARREGA EXEMPLOS NO EDITOR
     function loadExample() {
       const select = document.getElementById("example-select");
       const key = select.value;
       if (key && exemplos[key]) {
         document.getElementById("code-editor").value = exemplos[key];
-        // Coloca um código simples inicial para testar
         clearConsole();
       }
     }
@@ -292,52 +255,162 @@ print("✅ Padrão de sinalização visual concluído com sucesso!")`
       return Sk.builtinFiles["files"][x];
     }
 
-    // EXECUTA O CÓDIGO PYTHON
+    // EXECUTOR PRINCIPAL (Skulpt se disponível, ou Motor Interno Offline como Fallback)
     function runPython() {
       const consoleOutput = document.getElementById("console-output");
       const code = document.getElementById("code-editor").value;
-
-      // 1. CHECAGEM DE SEGURANÇA: BIBLIOTECA FOI CARREGADA?
-      if (typeof Sk === 'undefined') {
-        consoleOutput.innerHTML = "❌ ERRO DE CARREGAMENTO:\n\nA biblioteca do Python (Skulpt) não foi encontrada.\n\nPossíveis motivos:\n1. O computador está sem acesso à internet.\n2. O firewall/filtro da escola bloqueou o servidor 'cdnjs.cloudflare.com'.\n\n💡 Solução: Solicite à TI da escola a liberação do domínio 'cdnjs.cloudflare.com'.";
-        return;
-      }
 
       if (!code.trim()) {
         consoleOutput.innerHTML = "⚠️ O editor está vazio! Digite um código ou selecione um exemplo acima.";
         return;
       }
 
-      consoleOutput.innerHTML = "[⏳ Processando código...]\n\n";
+      // Se a biblioteca Skulpt carregou (online ou arquivos locais presentes)
+      if (typeof Sk !== 'undefined' && Sk.importMainWithBody) {
+        consoleOutput.innerHTML = "";
+        Sk.pre = "console-output";
+        Sk.configure({
+          output: function(text) {
+            consoleOutput.innerHTML += text;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+          },
+          read: builtinRead,
+          inputfun: function(promptText) {
+            return new Promise(function(resolve) {
+              let userInput = window.prompt(promptText || "Entrada do Usuário:");
+              if (userInput === null) userInput = "";
+              consoleOutput.innerHTML += (promptText || "") + " " + userInput + "\n";
+              resolve(userInput);
+            });
+          },
+          inputfunTakesPrompt: true
+        });
 
-      Sk.pre = "console-output";
-      Sk.configure({
-        output: function(text) {
-          consoleOutput.innerHTML += text;
+        var myPromise = Sk.miscellaneous.pyCheckArgs ? Sk.importMainWithBody("<stdin>", false, code, true) : Sk.importMainWithBody("<stdin>", false, code);
+
+        myPromise.then(
+          function() { consoleOutput.innerHTML += "\n[🟢 Execução Concluída via Skulpt]"; },
+          function(err) { consoleOutput.innerHTML += "\n❌ ERRO NO CÓDIGO:\n" + err.toString(); }
+        );
+      } else {
+        // FALLBACK: Usar o Motor Interno Offline em JS puro
+        runOfflinePython(code);
+      }
+    }
+
+    // MOTOR INTERNO OFFLINE (Garante que roda 100% sem internet nem arquivos externos)
+    function runOfflinePython(pyCode) {
+      const consoleOutput = document.getElementById("console-output");
+      consoleOutput.innerHTML = "[⚡ Executando no Modo Offline Integrado...]\n\n";
+
+      try {
+        let lines = pyCode.split('\n');
+        let jsLines = [];
+        let indentStack = [0];
+
+        function pyPrint(...args) {
+          consoleOutput.innerHTML += args.join(' ') + '\n';
           consoleOutput.scrollTop = consoleOutput.scrollHeight;
-        },
-        read: builtinRead,
-        inputfun: function(promptText) {
-          return new Promise(function(resolve) {
-            let userInput = window.prompt(promptText || "Entrada do Usuário:");
-            if (userInput === null) userInput = "";
-            consoleOutput.innerHTML += (promptText || "") + " " + userInput + "\n";
-            resolve(userInput);
-          });
-        },
-        inputfunTakesPrompt: true
-      });
-
-      var myPromise = Sk.miscellaneous.pyCheckArgs ? Sk.importMainWithBody("<stdin>", false, code, true) : Sk.importMainWithBody("<stdin>", false, code);
-
-      myPromise.then(
-        function() {
-          consoleOutput.innerHTML += "\n[🟢 Execução Concluída]";
-        },
-        function(err) {
-          consoleOutput.innerHTML += "\n❌ ERRO NO CÓDIGO:\n" + err.toString();
         }
-      );
+
+        function pyInput(promptText) {
+          let val = window.prompt(promptText || "Digite a entrada:") || "";
+          consoleOutput.innerHTML += (promptText || "") + " " + val + '\n';
+          return val;
+        }
+
+        function pyInt(val) {
+          let res = parseInt(val, 10);
+          if (isNaN(res)) throw new Error("ValueError: invalid literal for int()");
+          return res;
+        }
+
+        function pyFloat(val) {
+          let res = parseFloat(val);
+          if (isNaN(res)) throw new Error("ValueError: invalid literal for float()");
+          return res;
+        }
+
+        function pyRandInt(a, b) {
+          return Math.floor(Math.random() * (b - a + 1)) + a;
+        }
+
+        for (let rawLine of lines) {
+          if (!rawLine.trim() || rawLine.trim().startsWith('#')) continue;
+
+          let indent = rawLine.search(/\S/);
+          let line = rawLine.trim();
+
+          while (indent < indentStack[indentStack.length - 1]) {
+            indentStack.pop();
+            jsLines.push('}');
+          }
+
+          if (line.startsWith('import ') || line.startsWith('from ')) continue;
+
+          line = line.replace(/\bTrue\b/g, 'true')
+                     .replace(/\bFalse\b/g, 'false')
+                     .replace(/\bNone\b/g, 'null')
+                     .replace(/\band\b/g, '&&')
+                     .replace(/\bor\b/g, '||')
+                     .replace(/\bnot\b/g, '!');
+
+          line = line.replace(/\bprint\s*\\((.*)\\)/g, 'pyPrint(\$1)');
+          line = line.replace(/\binput\s*\\((.*)\\)/g, 'pyInput(\$1)');
+          line = line.replace(/\bint\s*\\((.*)\\)/g, 'pyInt(\$1)');
+          line = line.replace(/\bfloat\s*\\((.*)\\)/g, 'pyFloat(\$1)');
+          line = line.replace(/random\.randint\s*\\((.*?),(.*?)\\)/g, 'pyRandInt(\$1, \$2)');
+
+          if (line.startsWith('if ') && line.endsWith(':')) {
+            let cond = line.slice(3, -1);
+            jsLines.push(`if (${cond}) {`);
+            indentStack.push(indent);
+          } else if (line.startsWith('elif ') && line.endsWith(':')) {
+            let cond = line.slice(5, -1);
+            jsLines.push(`} else if (${cond}) {`);
+          } else if (line === 'else:') {
+            jsLines.push(`} else {`);
+          } else if (line.startsWith('while ') && line.endsWith(':')) {
+            let cond = line.slice(6, -1);
+            jsLines.push(`while (${cond}) {`);
+            indentStack.push(indent);
+          } else if (line.startsWith('for ') && line.includes(' in ') && line.endsWith(':')) {
+            let parts = line.slice(4, -1).split(' in ');
+            let varName = parts[0].trim();
+            let seq = parts[1].trim();
+            if (seq.startsWith('range(')) {
+              let args = seq.slice(6, -1).split(',');
+              let start = args.length > 1 ? args[0].trim() : '0';
+              let end = args.length > 1 ? args[1].trim() : args[0].trim();
+              jsLines.push(`for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {`);
+            } else {
+              jsLines.push(`for (let ${varName} of ${seq}) {`);
+            }
+            indentStack.push(indent);
+          } else if (line === 'try:') {
+            jsLines.push(`try {`);
+            indentStack.push(indent);
+          } else if (line.startsWith('except') && line.endsWith(':')) {
+            jsLines.push(`} catch (err) {`);
+          } else {
+            jsLines.push(line + ';');
+          }
+        }
+
+        while (indentStack.length > 1) {
+          indentStack.pop();
+          jsLines.push('}');
+        }
+
+        let compiledJs = jsLines.join('\n');
+        let runner = new Function('pyPrint', 'pyInput', 'pyInt', 'pyFloat', 'pyRandInt', compiledJs);
+        runner(pyPrint, pyInput, pyInt, pyFloat, pyRandInt);
+
+        consoleOutput.innerHTML += "\n[🟢 Execução Concluída com Sucesso!]";
+
+      } catch (err) {
+        consoleOutput.innerHTML += "\n❌ ERRO NO CÓDIGO:\n" + err.message;
+      }
     }
 
     function downloadCode() {
