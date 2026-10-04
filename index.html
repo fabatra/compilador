@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Compilador Python & Robótica (Modo Offline Integrado)</title>
   
-  <!-- Tenta carregar bibliotecas locais primeiro, depois CDNs de backup -->
+  <!-- Tentativas de carregamento (Local ou CDN) -->
   <script src="skulpt.min.js"></script>
   <script src="skulpt-stdlib.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.2.0/skulpt.min.js"></script>
@@ -166,7 +166,7 @@
 <body>
 
   <div class="header">
-    <h1>🐍 Compilador Python & Robótica <span class="status-badge">⚡ Pronto para Uso Offline</span></h1>
+    <h1>🐍 Compilador Python & Robótica <span class="status-badge">⚡ Suporte Offline Total</span></h1>
     <div class="controls-header">
       <label for="example-select" style="font-weight: bold;">📚 Exemplos:</label>
       <select id="example-select" onchange="loadExample()">
@@ -210,6 +210,7 @@
     <code>print("texto")</code> | 
     <code>input("pergunta")</code> | 
     <code>int(input())</code> | 
+    <code>float(input())</code> | 
     <code>if / elif / else</code> | 
     <code>while True: ... break</code> | 
     <code>try: ... except:</code>
@@ -255,7 +256,6 @@
       return Sk.builtinFiles["files"][x];
     }
 
-    // EXECUTOR PRINCIPAL (Skulpt se disponível, ou Motor Interno Offline como Fallback)
     function runPython() {
       const consoleOutput = document.getElementById("console-output");
       const code = document.getElementById("code-editor").value;
@@ -265,7 +265,7 @@
         return;
       }
 
-      // Se a biblioteca Skulpt carregou (online ou arquivos locais presentes)
+      // Se a biblioteca Skulpt estiver disponível
       if (typeof Sk !== 'undefined' && Sk.importMainWithBody) {
         consoleOutput.innerHTML = "";
         Sk.pre = "console-output";
@@ -289,51 +289,71 @@
         var myPromise = Sk.miscellaneous.pyCheckArgs ? Sk.importMainWithBody("<stdin>", false, code, true) : Sk.importMainWithBody("<stdin>", false, code);
 
         myPromise.then(
-          function() { consoleOutput.innerHTML += "\n[🟢 Execução Concluída via Skulpt]"; },
+          function() { consoleOutput.innerHTML += "\n[🟢 Execução Concluída]"; },
           function(err) { consoleOutput.innerHTML += "\n❌ ERRO NO CÓDIGO:\n" + err.toString(); }
         );
       } else {
-        // FALLBACK: Usar o Motor Interno Offline em JS puro
+        // MODO OFFLINE ROBUSTO (Garante a execução de float, int, input, print, etc.)
         runOfflinePython(code);
       }
     }
 
-    // MOTOR INTERNO OFFLINE (Garante que roda 100% sem internet nem arquivos externos)
     function runOfflinePython(pyCode) {
       const consoleOutput = document.getElementById("console-output");
-      consoleOutput.innerHTML = "[⚡ Executando no Modo Offline Integrado...]\n\n";
+      consoleOutput.innerHTML = "[⚡ Executando no Modo Offline...]\n\n";
 
       try {
         let lines = pyCode.split('\n');
         let jsLines = [];
         let indentStack = [0];
 
-        function pyPrint(...args) {
-          consoleOutput.innerHTML += args.join(' ') + '\n';
+        // FUNÇÕES NATIVAS EM NÍVEL DE ESCOPO
+        function print(...args) {
+          let strArgs = args.map(a => (a === null ? "None" : a === true ? "True" : a === false ? "False" : String(a)));
+          consoleOutput.innerHTML += strArgs.join(' ') + '\n';
           consoleOutput.scrollTop = consoleOutput.scrollHeight;
         }
 
-        function pyInput(promptText) {
+        function input(promptText) {
           let val = window.prompt(promptText || "Digite a entrada:") || "";
           consoleOutput.innerHTML += (promptText || "") + " " + val + '\n';
           return val;
         }
 
-        function pyInt(val) {
+        function int(val) {
           let res = parseInt(val, 10);
-          if (isNaN(res)) throw new Error("ValueError: invalid literal for int()");
+          if (isNaN(res)) throw new Error("ValueError: invalid literal for int() with base 10: '" + val + "'");
           return res;
         }
 
-        function pyFloat(val) {
+        function float(val) {
           let res = parseFloat(val);
-          if (isNaN(res)) throw new Error("ValueError: invalid literal for float()");
+          if (isNaN(res)) throw new Error("ValueError: invalid literal for float(): '" + val + "'");
           return res;
         }
 
-        function pyRandInt(a, b) {
-          return Math.floor(Math.random() * (b - a + 1)) + a;
+        function str(val) {
+          return String(val);
         }
+
+        function len(obj) {
+          if (obj && obj.length !== undefined) return obj.length;
+          return 0;
+        }
+
+        function range(start, stop, step) {
+          if (stop === undefined) { stop = start; start = 0; }
+          if (step === undefined) { step = 1; }
+          let arr = [];
+          for (let i = start; step > 0 ? i < stop : i > stop; i += step) arr.push(i);
+          return arr;
+        }
+
+        let random = {
+          randint: function(a, b) {
+            return Math.floor(Math.random() * (b - a + 1)) + a;
+          }
+        };
 
         for (let rawLine of lines) {
           if (!rawLine.trim() || rawLine.trim().startsWith('#')) continue;
@@ -355,12 +375,6 @@
                      .replace(/\bor\b/g, '||')
                      .replace(/\bnot\b/g, '!');
 
-          line = line.replace(/\bprint\s*\\((.*)\\)/g, 'pyPrint(\$1)');
-          line = line.replace(/\binput\s*\\((.*)\\)/g, 'pyInput(\$1)');
-          line = line.replace(/\bint\s*\\((.*)\\)/g, 'pyInt(\$1)');
-          line = line.replace(/\bfloat\s*\\((.*)\\)/g, 'pyFloat(\$1)');
-          line = line.replace(/random\.randint\s*\\((.*?),(.*?)\\)/g, 'pyRandInt(\$1, \$2)');
-
           if (line.startsWith('if ') && line.endsWith(':')) {
             let cond = line.slice(3, -1);
             jsLines.push(`if (${cond}) {`);
@@ -378,14 +392,7 @@
             let parts = line.slice(4, -1).split(' in ');
             let varName = parts[0].trim();
             let seq = parts[1].trim();
-            if (seq.startsWith('range(')) {
-              let args = seq.slice(6, -1).split(',');
-              let start = args.length > 1 ? args[0].trim() : '0';
-              let end = args.length > 1 ? args[1].trim() : args[0].trim();
-              jsLines.push(`for (let ${varName} = ${start}; ${varName} < ${end}; ${varName}++) {`);
-            } else {
-              jsLines.push(`for (let ${varName} of ${seq}) {`);
-            }
+            jsLines.push(`for (let ${varName} of ${seq}) {`);
             indentStack.push(indent);
           } else if (line === 'try:') {
             jsLines.push(`try {`);
@@ -403,8 +410,8 @@
         }
 
         let compiledJs = jsLines.join('\n');
-        let runner = new Function('pyPrint', 'pyInput', 'pyInt', 'pyFloat', 'pyRandInt', compiledJs);
-        runner(pyPrint, pyInput, pyInt, pyFloat, pyRandInt);
+        let runner = new Function('print', 'input', 'int', 'float', 'str', 'len', 'range', 'random', compiledJs);
+        runner(print, input, int, float, str, len, range, random);
 
         consoleOutput.innerHTML += "\n[🟢 Execução Concluída com Sucesso!]";
 
